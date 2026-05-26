@@ -232,7 +232,8 @@
         let gameActive = false;
         let moleTimer = null;
         let countdownTimer = null;
-        let currentMole = null;
+        let currentMoles = [];
+        let audioContext = null;
 
         const holes = document.querySelectorAll('.hole');
         const moles = document.querySelectorAll('.mole');
@@ -242,29 +243,90 @@
         const message = document.getElementById('message');
         const difficultySelect = document.getElementById('difficulty');
 
-        function randomHole() {
-            const idx = Math.floor(Math.random() * holes.length);
-            return holes[idx];
+        // 初始化音频上下文
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // 播放趣味音效
+        function playHitSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 创建有趣的音效序列
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        function randomHole(excludeHoles = []) {
+            const availableHoles = Array.from(holes).filter((_, index) => !excludeHoles.includes(index));
+            if (availableHoles.length === 0) return null;
+            const idx = Math.floor(Math.random() * availableHoles.length);
+            return availableHoles[idx];
+        }
+
+        function getMolesCount() {
+            // 游戏进行了多少秒 = 30 - timeLeft
+            const elapsed = 30 - timeLeft;
+            if (elapsed >= 20) {  // 20 秒后（剩余 10 秒或更少）
+                return 3;
+            } else if (elapsed >= 10) {  // 10 秒后（剩余 20 秒或更少）
+                return 2;
+            }
+            return 1;
         }
 
         function peep() {
             if (!gameActive) return;
 
             const speed = parseInt(difficultySelect.value);
-            const hole = randomHole();
-            const mole = hole.querySelector('.mole');
+            const molesCount = getMolesCount();
+            
+            // 清除之前的地鼠
+            currentMoles.forEach(mole => {
+                if (mole && mole.classList.contains('up')) {
+                    mole.classList.remove('up');
+                }
+            });
+            currentMoles = [];
 
-            if (currentMole && currentMole !== mole) {
-                currentMole.classList.remove('up');
+            // 创建指定数量的地鼠
+            const usedIndices = [];
+            for (let i = 0; i < molesCount; i++) {
+                const hole = randomHole(usedIndices);
+                if (!hole) continue;
+                
+                const mole = hole.querySelector('.mole');
+                const holeIndex = Array.from(holes).indexOf(hole);
+                usedIndices.push(holeIndex);
+                
+                mole.classList.add('up');
+                currentMoles.push(mole);
             }
 
-            mole.classList.add('up');
-            currentMole = mole;
-
             setTimeout(() => {
-                if (gameActive && mole.classList.contains('up')) {
-                    mole.classList.remove('up');
-                    currentMole = null;
+                if (gameActive) {
+                    currentMoles.forEach(mole => {
+                        if (mole && mole.classList.contains('up')) {
+                            mole.classList.remove('up');
+                        }
+                    });
+                    currentMoles = [];
                 }
             }, speed * 0.6);
 
@@ -276,6 +338,9 @@
             timeLeft = 30;
             gameActive = true;
             
+            // 初始化音频
+            initAudio();
+            
             scoreDisplay.textContent = score;
             timeDisplay.textContent = timeLeft;
             message.textContent = '';
@@ -285,6 +350,7 @@
             moles.forEach(mole => {
                 mole.classList.remove('up', 'hit');
             });
+            currentMoles = [];
 
             peep();
 
@@ -303,15 +369,17 @@
             clearInterval(countdownTimer);
             clearTimeout(moleTimer);
             
-            if (currentMole) {
-                currentMole.classList.remove('up');
-                currentMole = null;
-            }
+            currentMoles.forEach(mole => {
+                if (mole) {
+                    mole.classList.remove('up');
+                }
+            });
+            currentMoles = [];
 
             startBtn.disabled = false;
             difficultySelect.disabled = false;
             
-            let resultMessage = `游戏结束！你的得分是: ${score}`;
+            let resultMessage = `游戏结束！你的得分是：${score}`;
             if (score >= 20) {
                 resultMessage += ' 🏆 太棒了！';
             } else if (score >= 10) {
@@ -328,11 +396,20 @@
             const mole = e.target.closest('.mole');
             if (!mole || !mole.classList.contains('up')) return;
 
+            // 播放音效
+            playHitSound();
+            
             mole.classList.add('hit');
             mole.classList.remove('up');
+            
+            // 从当前地鼠列表中移除
+            const index = currentMoles.indexOf(mole);
+            if (index > -1) {
+                currentMoles.splice(index, 1);
+            }
+            
             score++;
             scoreDisplay.textContent = score;
-            currentMole = null;
 
             setTimeout(() => {
                 mole.classList.remove('hit');
