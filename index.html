@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            font-size: 3em;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.5);
+            }
+            to {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.6);
+            }
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.3em;
+            margin-bottom: 50px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .games-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.2);
+            text-decoration: none;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .game-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .game-card:hover .game-icon {
+            animation: none;
+            transform: scale(1.2);
+        }
+
+        .game-title {
+            color: white;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-description {
+            color: rgba(255,255,255,0.9);
+            font-size: 1em;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .game-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 60px;
+            color: rgba(255,255,255,0.7);
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .coming-soon:hover {
+            transform: none;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .coming-soon-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-card-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 游戏中心</h1>
+    <p class="subtitle">选择一款游戏开始挑战吧！</p>
+
+    <div class="games-container">
+        <div class="game-card-wrapper">
+            <a href="games/dishu.html" class="game-card">
+                <span class="game-icon">🐹</span>
+                <h2 class="game-title">打地鼠</h2>
+                <p class="game-description">经典打地鼠游戏，考验你的反应速度！在限定时间内尽可能多地击中地鼠。</p>
+                <span class="game-tag">反应类</span>
+            </a>
+        </div>
+
+        <div class="game-card-wrapper">
+            <a href="sudoku.html" class="game-card">
+                <span class="game-icon">🔢</span>
+                <h2 class="game-title">数独</h2>
+                <p class="game-description">经典数字逻辑游戏，锻炼你的逻辑思维能力。填充 9x9 网格，让每行、每列和每个 3x3 宫都包含 1-9 的数字。</p>
+                <span class="game-tag">益智类</span>
+            </a>
+        </div>
+
+        <div class="game-card-wrapper">
+            <div class="game-card coming-soon">
+                <span class="game-icon" style="animation: none;">🎯</span>
+                <h2 class="game-title">更多游戏</h2>
+                <p class="game-description">更多精彩游戏即将上线，敬请期待！</p>
+                <span class="game-tag" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">敬请期待</span>
+            </div>
+            <div class="coming-soon-badge">即将推出</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2024 游戏中心 | 享受游戏的乐趣</p>
+    </div>
+
+    <script>
+        // 添加点击效果
+        document.querySelectorAll('.game-card:not(.coming-soon)').forEach(card => {
+            card.addEventListener('click', function(e) {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
